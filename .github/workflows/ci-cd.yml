@@ -1,0 +1,57 @@
+name: Build and push for docker images
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get source code
+        uses: actions/checkout@v4
+
+      - name: Set up docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to your personal docker hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push api
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api_service
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-api:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-api:${{ github.sha }}
+
+      - name: Build and push location
+        uses: docker/build-push-action@v5
+        with:
+          context: ./location_service
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-location:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-location:${{ github.sha }}
+
+      - name: Build and push matcher
+        uses: docker/build-push-action@v5
+        with:
+          context: ./matcher_service
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-matcher:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-matcher:${{ github.sha }}
+
+      - name: Build and push simulator-alpha
+        uses: docker/build-push-action@v5
+        with:
+          context: ./driver_simulator
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-simulator-alpha:latest
+            ${{ secrets.DOCKERHUB_USERNAME }}/uber-simulator-alpha:${{ github.sha }}
