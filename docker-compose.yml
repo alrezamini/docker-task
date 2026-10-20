@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16-alpine
@@ -104,7 +102,7 @@ services:
       - georide-net
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    image: ghcr.io/google/cadvisor:v0.53.0
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
